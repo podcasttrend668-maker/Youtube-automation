@@ -66,3 +66,19 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n❌ Error: {e}")
         print("Check GitHub Actions logs for details")
+
+
+- name: Run YouTube Bot
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+        ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
+        LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
+      run: |
+        # Find and run the script
+        SCRIPT_PATH=$(find . -name "youtube_bot.py" -type f | head -n 1)
+        if [ -z "$SCRIPT_PATH" ]; then
+          echo "❌ youtube_bot.py not found!"
+          exit 1
+        fi
+        echo "✅ Found script at: $SCRIPT_PATH"
+        python "$SCRIPT_PATH"
