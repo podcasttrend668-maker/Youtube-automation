@@ -33,3 +33,17 @@ jobs:
       env:
         YOUTUBE_CREDENTIALS: ${{ secrets.YOUTUBE_CREDENTIALS }}
       run: python upload_to_youtube.py
+
+name: List files in directory
+      run: |
+        echo "=== Current directory ==="
+        pwd
+        echo ""
+        echo "=== Files here ==="
+        ls -la
+        echo ""
+        echo "=== Looking for youtube_bot.py ==="
+        find . -name "youtube_bot.py" -type f
+        echo ""
+        echo "=== All Python files ==="
+        find . -name "*.py" -type f
