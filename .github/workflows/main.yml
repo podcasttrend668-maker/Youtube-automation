@@ -10,14 +10,32 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout code
+    - name: Checkout repository
       uses: actions/checkout@v3
     
-    - name: Set up Python
+    - name: Set up Python 3.10
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
     
-    - name: Run bot
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: List files in directory
+      run: |
+        echo "Current directory:"
+        pwd
+        echo "Files in directory:"
+        ls -la
+    
+    - name: Run YouTube Bot
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+        ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
+        LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
       run: |
         python youtube_bot.py
+
+
