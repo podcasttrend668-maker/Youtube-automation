@@ -1,0 +1,44 @@
+name: Daily YouTube Upload
+
+on:
+  schedule:
+    # Runs at 2 PM UTC every day (adjust timezone as needed)
+    - cron: '0 14 * * *'
+  
+  # Allows manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  upload-video:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Run automation
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+        ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
+        LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
+      run: |
+        python youtube_bot.py
+    
+    - name: Upload logs
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: automation-logs
+        path: |
+          *.log
+          *.txt
