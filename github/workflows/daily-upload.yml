@@ -47,3 +47,74 @@ name: List files in directory
         echo ""
         echo "=== All Python files ==="
         find . -name "*.py" -type f
+
+name: Daily YouTube Upload
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        path: repo
+    
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests
+    
+    - name: Find and list files
+      run: |
+        echo "📁 Current directory:"
+        pwd
+        echo ""
+        echo "📄 Files in current directory:"
+        ls -la
+        echo ""
+        echo "📄 Files in repo directory:"
+        ls -la repo/ || echo "No repo directory"
+        echo ""
+        echo "🔍 Searching for youtube_bot.py everywhere:"
+        find . -name "youtube_bot.py" -type f
+    
+    - name: Run YouTube Bot
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+        ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
+        LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
+      run: |
+        echo "🤖 Looking for youtube_bot.py..."
+        
+        # Check multiple possible locations
+        if [ -f "repo/youtube_bot.py" ]; then
+          echo "✅ Found at: repo/youtube_bot.py"
+          cd repo
+          python youtube_bot.py
+        elif [ -f "youtube_bot.py" ]; then
+          echo "✅ Found at: ./youtube_bot.py"
+          python youtube_bot.py
+        else
+          # Search everywhere and run the first one found
+          SCRIPT=$(find . -name "youtube_bot.py" -type f | head -1)
+          if [ -n "$SCRIPT" ]; then
+            echo "✅ Found at: $SCRIPT"
+            python "$SCRIPT"
+          else
+            echo "❌ ERROR: youtube_bot.py not found anywhere!"
+            echo "📂 Directory structure:"
+            find . -type f -name "*.py"
+            exit 1
+          fi
+        fi
