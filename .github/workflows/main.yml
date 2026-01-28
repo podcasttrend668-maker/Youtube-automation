@@ -21,27 +21,29 @@ jobs:
     - name: Install packages
       run: pip install requests
     
-    - name: Show directory
+    - name: Show everything
       run: |
-        echo "📁 Where am I?"
+        echo "=== Current location ==="
         pwd
-        echo ""
-        echo "📄 What files are here?"
         ls -la
         echo ""
-        echo "🔍 Finding youtube_bot.py:"
-        find . -name "*.py"
+        echo "=== All Python files ==="
+        find . -name "*.py" -ls
     
     - name: Run bot
+      working-directory: ${{ github.workspace }}
       env:
         YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
         ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
         LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
       run: |
+        echo "Looking for youtube_bot.py..."
+        ls -la youtube_bot.py || echo "Not in current dir"
+        
         if [ -f "youtube_bot.py" ]; then
-          python youtube_bot.py
+          echo "Found it! Running..."
+          python3 youtube_bot.py
         else
-          echo "File not in root, searching..."
-          FILE=$(find . -name "youtube_bot.py" | head -1)
-          python "$FILE"
+          echo "Searching subdirectories..."
+          find . -name "youtube_bot.py" -exec python3 {} \;
         fi
