@@ -1,1 +1,49 @@
-duplicate
+name: Daily YouTube Upload
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    
+    - name: Install packages
+      run: pip install requests
+    
+    - name: Show everything
+      run: |
+        echo "=== Current location ==="
+        pwd
+        ls -la
+        echo ""
+        echo "=== All Python files ==="
+        find . -name "*.py" -ls
+    
+    - name: Run bot
+      working-directory: ${{ github.workspace }}
+      env:
+        YOUTUBE_KEY: ${{ secrets.YOUTUBE_KEY }}
+        ELEVENLABS_KEY: ${{ secrets.ELEVENLABS_KEY }}
+        LEONARDO_KEY: ${{ secrets.LEONARDO_KEY }}
+      run: |
+        echo "Looking for youtube_bot.py..."
+        ls -la youtube_bot.py || echo "Not in current dir"
+        
+        if [ -f "youtube_bot.py" ]; then
+          echo "Found it! Running..."
+          python3 youtube_bot.py
+        else
+          echo "Searching subdirectories..."
+          find . -name "youtube_bot.py" -exec python3 {} \;
+        fi
